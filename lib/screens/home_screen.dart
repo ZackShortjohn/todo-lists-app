@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: StreamBuilder<List<Map<String, dynamic>>>(
+        child: StreamBuilder<List<Map<String, dynamic>>>( 
           stream: _firestoreService.getLists(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
@@ -57,7 +57,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     trailing: IconButton(
                       icon: Icon(Icons.delete_forever, color: Colors.redAccent),
-                      onPressed: () => _firestoreService.deleteList(list['id']),
+                      onPressed: () => _showDeleteConfirmationDialog(context, list['id']),
                     ),
                     onTap: () {
                       Navigator.push(
@@ -87,6 +87,34 @@ class HomeScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  // Show the delete confirmation dialog
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, String listId) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure?'),
+          content: Text('Do you really want to delete this to-do list? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog without doing anything
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _firestoreService.deleteList(listId); // Proceed with deletion
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
   }
 
