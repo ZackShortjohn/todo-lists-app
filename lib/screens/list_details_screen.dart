@@ -10,7 +10,13 @@ class ListDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("List Details")),
+      appBar: AppBar(
+        title: Text(
+          "List Details",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.teal,
+      ),
       body: StreamBuilder<List<String>>(
         stream: _firestoreService.getListItems(listId),
         builder: (context, snapshot) {
@@ -18,16 +24,32 @@ class ListDetailsScreen extends StatelessWidget {
 
           final items = snapshot.data!;
           return items.isEmpty
-              ? Center(child: Text("No items yet. Add some!"))
+              ? Center(
+                  child: Text(
+                    "No items yet. Add some!",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+                  ),
+                )
               : ListView.builder(
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    return ListTile(
-                      title: Text(item),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _firestoreService.removeItem(listId, item),
+                    return Card(
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.all(16),
+                        title: Text(
+                          item,
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _firestoreService.removeItem(listId, item),
+                        ),
                       ),
                     );
                   },
@@ -41,7 +63,9 @@ class ListDetailsScreen extends StatelessWidget {
             _firestoreService.addItem(listId, newItem);
           }
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, size: 30),
+        backgroundColor: Colors.teal,
+        elevation: 6,
       ),
     );
   }
@@ -51,7 +75,10 @@ class ListDetailsScreen extends StatelessWidget {
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('New Item'),
+        title: Text(
+          'New Item',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: TextField(
           onChanged: (value) => newItem = value,
           decoration: InputDecoration(hintText: "Enter item name"),

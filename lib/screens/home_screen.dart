@@ -8,31 +8,50 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("To-Do Lists")),
+      appBar: AppBar(
+        title: Text(
+          "To-Do Lists",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.teal,
+      ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _firestoreService.getLists(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
 
           final lists = snapshot.data!;
           return ListView.builder(
             itemCount: lists.length,
             itemBuilder: (context, index) {
               final list = lists[index];
-              return ListTile(
-                title: Text(list['name']),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => _firestoreService.deleteList(list['id']),
+              return Card(
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ListDetailsScreen(listId: list['id']),
-                    ),
-                  );
-                },
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(16),
+                  title: Text(
+                    list['name'],
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _firestoreService.deleteList(list['id']),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ListDetailsScreen(listId: list['id']),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           );
@@ -45,7 +64,9 @@ class HomeScreen extends StatelessWidget {
             _firestoreService.addList(newListName);
           }
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, size: 30),
+        backgroundColor: Colors.teal,
+        elevation: 6,
       ),
     );
   }
@@ -55,7 +76,10 @@ class HomeScreen extends StatelessWidget {
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('New List'),
+        title: Text(
+          'New List',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: TextField(
           onChanged: (value) => newListName = value,
           decoration: InputDecoration(hintText: "Enter list name"),
