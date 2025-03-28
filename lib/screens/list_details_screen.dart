@@ -13,48 +13,58 @@ class ListDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "List Details",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.indigo,
+        elevation: 4,
+        shadowColor: Colors.black.withOpacity(0.2),
+        centerTitle: true,
       ),
-      body: StreamBuilder<List<String>>(
-        stream: _firestoreService.getListItems(listId),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: StreamBuilder<List<String>>(
+          stream: _firestoreService.getListItems(listId),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
 
-          final items = snapshot.data!;
-          return items.isEmpty
-              ? Center(
-                  child: Text(
-                    "No items yet. Add some!",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+            final items = snapshot.data!;
+            if (items.isEmpty) {
+              return Center(
+                child: Text(
+                  "No items in this list yet. Add some!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Card(
+                  margin: EdgeInsets.only(bottom: 12),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                )
-              : ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return Card(
-                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.all(16),
-                        title: Text(
-                          item,
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _firestoreService.removeItem(listId, item),
-                        ),
-                      ),
-                    );
-                  },
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    leading: Icon(Icons.arrow_right, color: Colors.grey[600]),
+                    title: Text(
+                      item,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.black87),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete_outline, color: Colors.redAccent),
+                      onPressed: () => _firestoreService.removeItem(listId, item),
+                    ),
+                  ),
                 );
-        },
+              },
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -63,10 +73,12 @@ class ListDetailsScreen extends StatelessWidget {
             _firestoreService.addItem(listId, newItem);
           }
         },
-        child: Icon(Icons.add, size: 30),
-        backgroundColor: Colors.teal,
+        child: Icon(Icons.add, size: 36, color: Colors.white),
+        backgroundColor: Colors.indigo,
         elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -77,15 +89,24 @@ class ListDetailsScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Text(
           'New Item',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         content: TextField(
           onChanged: (value) => newItem = value,
-          decoration: InputDecoration(hintText: "Enter item name"),
+          decoration: InputDecoration(
+            hintText: "Enter item name",
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, newItem), child: Text('Add')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(fontSize: 16)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, newItem),
+            child: Text('Add', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
     );
